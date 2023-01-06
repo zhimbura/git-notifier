@@ -7,8 +7,8 @@ import org.ktorm.schema.varchar
 
 object Aliases : Table<Alias>("t_aliases") {
     val id = int("id").primaryKey().bindTo { it.id }
-    val gitName = varchar("git_name").bindTo { it.gitName }
-    val messengerName = varchar("messenger_name").bindTo { it.messengerName }
+    val gitLogin = varchar("git_login").bindTo { it.gitLogin }
+    val messengerLogin = varchar("messenger_login").bindTo { it.messengerLogin }
     val gitSourceId = int("git_source_id").references(GitSources) { it.gitSource }
     val messengerTypeId = int("messenger_type_id").references(MessengerTypes) { it.messengerType }
 }

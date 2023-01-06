@@ -3,6 +3,7 @@ val kotlin_version: String by project
 val logback_version: String by project
 val ktom_version: String by project
 val postgresql_version: String by project
+val kotlinx_serialization: String by project
 
 plugins {
     kotlin("jvm") version "1.7.22"
@@ -31,6 +32,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("org.postgresql:postgresql:$postgresql_version")
     implementation("org.ktorm:ktorm-core:$ktom_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinx_serialization")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }

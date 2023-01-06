@@ -8,5 +8,5 @@ import org.ktorm.schema.varchar
 object GitSources : Table<GitSource>("t_git_sources") {
     val id = int("id").primaryKey().bindTo { it.id }
     val name = varchar("name").bindTo { it.name }
-    val domain = varchar("domain").bindTo { it.domain }
+    val source = varchar("source").bindTo { it.source }
 }
