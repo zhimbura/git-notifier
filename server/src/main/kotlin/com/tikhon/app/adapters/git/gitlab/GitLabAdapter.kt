@@ -22,16 +22,16 @@ object GitLabAdapter : GitAdapter("GitLab") {
         return when (kind.objectKind) {
           ObjectKindType.PIPELINE -> parsePipeline(data)
           ObjectKindType.MERGE_REQUEST -> parseMergeRequest(data)
-          else -> null
+          else -> null // TODO logger("Не поддерживается")
         }
     }
 
     private fun parsePipeline(data: String): IGitEvent {
         val pipelineHook = json.decodeFromString(PipelineHook.serializer(), data)
-        TODO()
+        TODO("Сформировать и кинуть события в ApplicationCore")
     }
 
     private fun parseMergeRequest(data: String): IGitEvent {
-        TODO()
+        TODO("Сформировать и кинуть события в ApplicationCore")
     }
 }

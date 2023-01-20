@@ -8,8 +8,11 @@ import com.tikhon.plugins.*
 
 private val appCore = ApplicationCore()
 
+private val PORT = System.getenv("APP_PORT").toInt()
+private val HOST = System.getenv("APP_HOST")
+
 fun main() {
-    embeddedServer(CIO, port = 8080, host = "0.0.0.0", module = Application::module)
+    embeddedServer(CIO, port = PORT, host = HOST, module = Application::module)
         .start(wait = true)
 }
 

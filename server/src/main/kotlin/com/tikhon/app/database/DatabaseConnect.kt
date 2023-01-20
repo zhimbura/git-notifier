@@ -16,7 +16,7 @@ class DatabaseConnect {
         "jdbc:postgresql://$DB_HOST:$DB_PORT/$DB_NAME?currentSchema=${DB_SCHEMA}&user=$DB_USER&password=$DB_PASSWORD"
     )
 
-    init {
+    fun checkConnect() {
         require(isValidTables()) { "Ошибка инициализации подключения к базе данных" }
     }
 

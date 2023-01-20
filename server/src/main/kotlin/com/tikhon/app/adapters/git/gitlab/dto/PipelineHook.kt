@@ -22,7 +22,7 @@ data class PipelineHook(
 @Serializable
 data class ObjectAttributes(
     val id: Int,
-    val iid: Int,
+    val iid: Int? = null,
     val ref: String,
     val tag: Boolean,
     val sha: String,
@@ -35,7 +35,7 @@ data class ObjectAttributes(
     val createdAt: String,
     @property:SerialName("finished_at")
     val finishedAt: String,
-    val duration: Float,
+    val duration: Float? = null,
     val variables: List<Variable>? = emptyList()
 )
 
@@ -48,7 +48,7 @@ data class Variable(
 @Serializable
 data class MergeRequest(
     val id: Int,
-    val iid: Int,
+    val iid: Int? = null,
     val title: String,
     @property:SerialName("source_branch")
     val sourceBranch: String,
@@ -142,9 +142,9 @@ data class BuildStage(
     val startedAt: String? = null,
     @property:SerialName("finished_at")
     val finishedAt: String? = null,
-    val duration: Float,
+    val duration: Float? = null,
     @property:SerialName("queued_duration")
-    val queuedDuration: Float,
+    val queuedDuration: Float? = null,
     @property:SerialName("failure_reason")
     val failureReason: String? = null,
     @property:SerialName("when")
