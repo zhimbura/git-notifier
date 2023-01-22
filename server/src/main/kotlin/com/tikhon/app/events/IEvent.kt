@@ -14,7 +14,8 @@ interface IGitEvent : IEvent {
         val status: Status, // TODO Остальные данные тоже переделать на DTO
         val project: GitProject,
         val branch: String,
-        val users: List<GitUser>
+        val users: List<GitUser>,
+        val lastCommitMessage: String
     ) : IGitEvent
 }
 

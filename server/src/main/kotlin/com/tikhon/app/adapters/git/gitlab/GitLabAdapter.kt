@@ -5,6 +5,10 @@ import com.tikhon.app.adapters.git.gitlab.dto.ObjectKind
 import com.tikhon.app.adapters.git.gitlab.dto.ObjectKindType
 import com.tikhon.app.adapters.git.gitlab.dto.PipelineHook
 import com.tikhon.app.events.IGitEvent
+import com.tikhon.app.events.dto.git.GitProject
+import com.tikhon.app.events.dto.git.GitSource
+import com.tikhon.app.events.dto.git.GitUser
+import com.tikhon.app.events.dto.git.Status
 import kotlinx.serialization.json.Json
 
 // TODO Переделать на аннотации
@@ -28,7 +32,17 @@ object GitLabAdapter : GitAdapter("GitLab") {
 
     private fun parsePipeline(data: String): IGitEvent {
         val pipelineHook = json.decodeFromString(PipelineHook.serializer(), data)
-        TODO("Сформировать и кинуть события в ApplicationCore")
+        return IGitEvent.PipelineEvent(
+            gitSource = GitSource.fromURL(pipelineHook.project.webUrl),
+            status = Status.valueOf(pipelineHook.objectAttributes.status.uppercase()),
+            project = GitProject(
+                pipelineHook.project.name,
+                pipelineHook.project.namespace
+            ),
+            branch = pipelineHook.objectAttributes.ref,
+            users = pipelineHook.builds.map { GitUser(it.user.name, it.user.username) },
+            lastCommitMessage = pipelineHook.commit.message,
+        )
     }
 
     private fun parseMergeRequest(data: String): IGitEvent {

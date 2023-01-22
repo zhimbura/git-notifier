@@ -152,4 +152,5 @@ data class BuildStage(
     val manual: Boolean,
     @property:SerialName("allow_failure")
     val allowFailure: Boolean,
+    val user: User,
 )

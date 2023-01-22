@@ -14,7 +14,7 @@ fun Application.webhooks(appCore: ApplicationCore) {
             val bodyRequest: String = call.receiveText()
             val event = GitLabAdapter.parseEvent(bodyRequest)
             if (event != null) {
-                appCore.receiveEvent(event)
+                appCore.receiveGitEvent(event)
                 call.response.status(HttpStatusCode.OK)
             } else {
                 call.response.status(HttpStatusCode.NotFound)

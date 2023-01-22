@@ -23,8 +23,7 @@ enum class ObjectKindType {
     @SerialName("deployment")
     DEPLOYMENT,
     @SerialName("feature_flag")
-    FEATURE_FLAG,
-
+    FEATURE_FLAG
 }
 
 @Serializable
