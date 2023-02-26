@@ -20,7 +20,7 @@ class DatabaseConnect {
         require(isValidTables()) { "Ошибка инициализации подключения к базе данных" }
     }
 
-    fun getMessagesByRepository(gitSource: String, projectName: String, projectNamespace: String): Map<String, Set<String>>? {
+    fun getMessagesByRepository(gitSource: String, pathWithNameSpace: String): Map<String, Set<String>>? {
         // TODO Оптимизировать запросы
         val source = db
             .from(GitSources)
@@ -34,7 +34,7 @@ class DatabaseConnect {
         val repository = db
             .from(Repositories)
             .select(Repositories.id)
-            .where { (Repositories.fullName eq "$projectNamespace/$projectName") and (Repositories.gitSourceId eq source.first()) }
+            .where { (Repositories.fullName eq pathWithNameSpace) and (Repositories.gitSourceId eq source.first()) }
             .mapNotNull { it[Repositories.id] }
         if (repository.isEmpty() || repository.size > 1) {
             println("Не найден репозиторий")

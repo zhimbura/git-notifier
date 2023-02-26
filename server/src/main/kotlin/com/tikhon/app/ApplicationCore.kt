@@ -1,5 +1,6 @@
 package com.tikhon.app
 
+import com.tikhon.app.adapters.messenger.MessengerAdapter.Companion.getAdapter
 import com.tikhon.app.adapters.messenger.TelegramAdapter
 import com.tikhon.app.database.DatabaseConnect
 import com.tikhon.app.events.IEvent
@@ -9,10 +10,10 @@ import com.tikhon.app.events.IMessengerEvent
 class ApplicationCore {
     val connect = DatabaseConnect()
     // Получаем уведомление о добавлении проекта, записываем в какой чат какой проект был добавлен
-
+    val telegramAdapter = TelegramAdapter()
     init {
-        TelegramAdapter.start()
         connect.checkConnect()
+        telegramAdapter.start()
     }
 
     fun receiveEvent(event: IEvent) {
@@ -25,16 +26,21 @@ class ApplicationCore {
     fun receiveGitEvent(event: IGitEvent) {
         when (event) {
             is IGitEvent.PipelineEvent -> {
-                val repositoryFullName = "${event.gitSource.url}/${event.project.namespace}/${event.project.namespace}"
                 val messengers = connect.getMessagesByRepository(
                     event.gitSource.name,
-                    projectName = event.project.name,
-                    projectNamespace = event.project.namespace
-                )
-                TODO("Достать адаптер мессенджера и отправить сообщение")
+                    event.project.pathWithNameSpace,
+                ) ?: return
+
+                for ((type, chats) in messengers.entries) {
+                    val messengerAdapter = getAdapter(type)
+                    for (chatId in chats) {
+                        messengerAdapter.sendMessage(chatId, event.asMessage())
+                    }
+                }
+            }
+            else -> {
+                // TODO Добавить остальные события и разбить по функциям
             }
         }
     }
-
-
 }

@@ -37,7 +37,8 @@ object GitLabAdapter : GitAdapter("GitLab") {
             status = Status.valueOf(pipelineHook.objectAttributes.status.uppercase()),
             project = GitProject(
                 pipelineHook.project.name,
-                pipelineHook.project.namespace
+                pipelineHook.project.namespace,
+                pipelineHook.project.pathWithNamespace,
             ),
             branch = pipelineHook.objectAttributes.ref,
             users = pipelineHook.builds.map { GitUser(it.user.name, it.user.username) },
