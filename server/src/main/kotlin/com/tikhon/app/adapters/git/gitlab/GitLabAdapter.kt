@@ -41,7 +41,7 @@ object GitLabAdapter : GitAdapter("GitLab") {
                 pipelineHook.project.pathWithNamespace,
             ),
             branch = pipelineHook.objectAttributes.ref,
-            users = pipelineHook.builds.map { GitUser(it.user.name, it.user.username) },
+            users = pipelineHook.builds.map { GitUser(it.user.name, it.user.username) }.distinct(),
             lastCommitMessage = pipelineHook.commit.message,
         )
     }

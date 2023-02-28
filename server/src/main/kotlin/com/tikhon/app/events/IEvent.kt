@@ -22,13 +22,12 @@ sealed interface IGitEvent : IEvent {
         // TODO добавить ссылку на Pipeline
         // TODO добавить название если Pipeline завершился с ошибкой
         // TODO добавить ссылку на Job если Pipeline завершился с ошибкой
-        override fun asMessage(): String = """
-            Status: ${status.content}
-            Project: ${project.pathWithNameSpace}
-            Branch: $branch
-            User(s): ${users.joinToString(",") { "${it.name} (@${it.userName})" }}
-            Commit message: $lastCommitMessage
-        """.trimIndent()
+        override fun asMessage(): String =
+                "*Status*: ${status.content}\n" +
+                "*Project*: ${project.pathWithNameSpace}\n" +
+                "*Branch*: $branch\n" +
+                "*User(s)*: ${users.joinToString(",") { "${it.name} (@${it.userName})" }}\n" +
+                "*Commit message*: $lastCommitMessage"
     }
 }
 

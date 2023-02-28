@@ -5,6 +5,7 @@ import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
+import com.github.kotlintelegrambot.entities.ParseMode
 
 val DEV_MSG = """
     В данный момент бот находится в разработке
@@ -54,7 +55,7 @@ class TelegramAdapter : MessengerAdapter("telegram") {
 
     override fun sendMessage(chatId: String, message: String) {
         val chat = chatId.toChatId()
-        bot.sendMessage(chat, message)
+        bot.sendMessage(chat, message, parseMode = ParseMode.MARKDOWN)
     }
 
     private fun addProject(chatId: Long, message: String) {

@@ -5,4 +5,5 @@ enum class Status(val content: String) {
     RUNNING("▶ (running)"),
     SUCCESS("✅ (success)"),
     PENDING("⌛ (pending)"),
+    CANCELED("⦸ (canceled)"),
 }

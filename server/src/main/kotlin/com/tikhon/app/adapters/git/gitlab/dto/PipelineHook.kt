@@ -34,7 +34,7 @@ data class ObjectAttributes(
     @property:SerialName("created_at")
     val createdAt: String,
     @property:SerialName("finished_at")
-    val finishedAt: String,
+    val finishedAt: String? = null,
     val duration: Float? = null,
     val variables: List<Variable>? = emptyList()
 )
