@@ -38,13 +38,15 @@ sealed interface IMessengerEvent : IEvent {
     data class ProjectSubscribeEvent(
         override val messengerName: String,
         val chatId: String,
-        val projectSource: GitSource
+        val projectSource: GitSource,
+        val project: GitProject
     ) : IMessengerEvent
 
     data class ProjectUnsubscribeEvent(
         override val messengerName: String,
         val chatId: String,
-        val projectSource: GitSource
+        val projectSource: GitSource,
+        val project: GitProject
     ) : IMessengerEvent
 
 }

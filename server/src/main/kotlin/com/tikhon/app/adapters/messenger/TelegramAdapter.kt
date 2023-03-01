@@ -13,7 +13,7 @@ val DEV_MSG = """
     Или можете написать мне в личные сообщения @your_rubicon с вопросом чем можно помочь 
 """.trimIndent()
 
-fun createBotAPI(vararg commands: Pair<String, (Long, String) -> Unit>) = bot {
+fun createBotAPI(vararg commands: Pair<String, (String, String) -> Unit>) = bot {
     token = System.getenv("TG_API_TOKEN")
     dispatch {
         text {
@@ -30,7 +30,7 @@ fun createBotAPI(vararg commands: Pair<String, (Long, String) -> Unit>) = bot {
                     .takeIf { it > -1 }
                     ?: return@command
                 val textWithoutCommand = textMessage.substring(firstSpace + 1).trim()
-                handler(message.chat.id, textWithoutCommand)
+                handler(message.chat.id.toString(), textWithoutCommand)
             }
         }
     }
@@ -56,15 +56,6 @@ class TelegramAdapter : MessengerAdapter("telegram") {
     override fun sendMessage(chatId: String, message: String) {
         val chat = chatId.toChatId()
         bot.sendMessage(chat, message, parseMode = ParseMode.MARKDOWN)
-    }
-
-    private fun addProject(chatId: Long, message: String) {
-       // TODO("Реализовать добавление проекта") перенести абстрактные команды в родительский класс
-        todo(chatId, message)
-    }
-
-    private fun todo(chatId: Long, message: String) {
-        bot.sendMessage(chatId.toChatId(), message)
     }
 }
 

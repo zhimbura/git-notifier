@@ -1,11 +1,12 @@
 package com.tikhon.app
 
+import com.tikhon.app.adapters.messenger.MessengerAdapter
 import com.tikhon.app.adapters.messenger.MessengerAdapter.Companion.getAdapter
 import com.tikhon.app.adapters.messenger.TelegramAdapter
 import com.tikhon.app.database.DatabaseConnect
-import com.tikhon.app.events.IEvent
 import com.tikhon.app.events.IGitEvent
 import com.tikhon.app.events.IMessengerEvent
+import com.tikhon.app.events.MessengerEventType
 
 class ApplicationCore {
     val connect = DatabaseConnect()
@@ -14,12 +15,19 @@ class ApplicationCore {
     init {
         connect.checkConnect()
         telegramAdapter.start()
+        telegramAdapter.on(MessengerEventType.ADD_PROJECT) { receiveMessengerEvent(it, telegramAdapter) }
     }
 
-    fun receiveEvent(event: IEvent) {
+    fun receiveMessengerEvent(event: IMessengerEvent, messenger: MessengerAdapter) {
         when (event) {
-            is IGitEvent -> receiveGitEvent(event)
-            is IMessengerEvent -> {}
+            is IMessengerEvent.ProjectSubscribeEvent -> {
+                messenger.sendMessage(event.chatId, "Проект распознан ${event.project}")
+                // TODO добавить в базу гит, проект и подписку
+            }
+
+            is IMessengerEvent.ProjectUnsubscribeEvent -> {
+
+            }
         }
     }
 
@@ -37,9 +45,6 @@ class ApplicationCore {
                         messengerAdapter.sendMessage(chatId, event.asMessage())
                     }
                 }
-            }
-            else -> {
-                // TODO Добавить остальные события и разбить по функциям
             }
         }
     }

@@ -3,6 +3,8 @@ package com.tikhon.app.adapters.messenger
 import com.tikhon.app.events.EventEmitter
 import com.tikhon.app.events.IMessengerEvent
 import com.tikhon.app.events.MessengerEventType
+import com.tikhon.app.events.dto.git.GitProject
+import com.tikhon.app.events.dto.git.GitSource
 import java.lang.IllegalStateException
 
 abstract class MessengerAdapter(val messengerName: String) : EventEmitter<MessengerEventType, IMessengerEvent>() {
@@ -22,9 +24,35 @@ abstract class MessengerAdapter(val messengerName: String) : EventEmitter<Messen
         }
     }
 
-    public abstract fun sendMessage(chatId: String, message: String)
+    abstract fun sendMessage(chatId: String, message: String)
 
     protected abstract fun beforeStart()
+
+    protected fun addProject(chatId: String, message: String) {
+        val projectSource = try {
+            GitSource.fromURL(message)
+        } catch (e: Exception) {
+            sendMessage(chatId, "Невозможно разобрать ссылку на проект, пример правильной ссылки http://gitlab.south.rt.ru/epc/ompo-sdk-kotlin")
+            return
+        }
+        val projectInfo = try {
+            GitProject.fromURL(message)
+        } catch (e: Exception) {
+            sendMessage(chatId, "Невозможно разобрать ссылку на проект, пример правильной ссылки http://gitlab.south.rt.ru/epc/ompo-sdk-kotlin")
+            return
+        }
+        val event = IMessengerEvent.ProjectSubscribeEvent(
+            messengerName,
+            chatId,
+            projectSource,
+            projectInfo
+        )
+        this.emit(MessengerEventType.ADD_PROJECT, event)
+    }
+
+    protected fun todo(chatId: String, message: String) {
+        sendMessage(chatId, message)
+    }
 
     companion object {
         private val adapters: MutableMap<String, MessengerAdapter> = mutableMapOf()
@@ -34,7 +62,7 @@ abstract class MessengerAdapter(val messengerName: String) : EventEmitter<Messen
             adapters[type] = adapter
         }
 
-        public fun getAdapter(type: String) : MessengerAdapter {
+        fun getAdapter(type: String) : MessengerAdapter {
             return adapters[type] ?: throw IllegalStateException("Попытка получить ре реализованный адаптер")
         }
     }
