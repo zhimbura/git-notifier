@@ -22,53 +22,36 @@ class DatabaseConnect {
 
     fun getMessagesByRepository(gitSource: String, pathWithNameSpace: String): Map<String, Set<String>>? {
         // TODO Оптимизировать запросы
-        val source = db
-            .from(GitSources)
-            .select(GitSources.id)
-            .where { GitSources.name eq gitSource }
-            .mapNotNull { it[GitSources.id] }
-        if (source.isEmpty() || source.size > 1) {
+        val sourceId = getGetSourceId(gitSource)
+        if (sourceId == null) {
             println("Не найден Git источник")
             return null// TODO Возможно нужно кинуть ошибку ?
         }
-        val repository = db
-            .from(Repositories)
-            .select(Repositories.id)
-            .where { (Repositories.fullName eq pathWithNameSpace) and (Repositories.gitSourceId eq source.first()) }
-            .mapNotNull { it[Repositories.id] }
-        if (repository.isEmpty() || repository.size > 1) {
+        val repositoryId = getRepositoryId(sourceId, pathWithNameSpace)
+        if (repositoryId == null) {
             println("Не найден репозиторий")
             return null// TODO Возможно нужно кинуть ошибку ?
         }
-        val subscribers = db
-            .from(RepositorySubscribes)
-            .select(listOf(RepositorySubscribes.chatId, RepositorySubscribes.messengerTypeId))
-            .where{ RepositorySubscribes.repositoryId eq repository.first() }
-            .map { it[RepositorySubscribes.chatId] to it[RepositorySubscribes.messengerTypeId] }
-        if (repository.isEmpty() || repository.size > 1) {
+        val subscribers = getSubscribes(repositoryId)
+        if (subscribers.isEmpty()) {
             println("Не найдены подписки")
             return null// TODO Возможно нужно кинуть ошибку ?
         }
-        val messengers = subscribers.mapNotNull { it.second }.toSet()
+        val messengers = subscribers.map { it.second }.toSet()
         val messengerTypes = messengers.flatMap { messengerId ->
             db
                 .from(MessengerTypes)
                 .select(MessengerTypes.name)
-                .where{ MessengerTypes.id eq messengerId}
+                .where { MessengerTypes.id eq messengerId }
                 .mapNotNull { messengerId to it[MessengerTypes.name] }
         }.toMap()
         val groupedByMessenger: LinkedHashMap<String, LinkedHashSet<String>> = linkedMapOf()
         for ((chatId, messengerId) in subscribers) {
-            if (chatId != null && messengerId != null) {
-                val messengerType = messengerTypes[messengerId]
-                check(messengerType != null) { "Ошибка данных" }
-                groupedByMessenger
-                    .getOrPut(messengerType) { linkedSetOf() }
-                    .add(chatId)
-            } else {
-                println("Не найден тип мессенджера")
-                throw Exception("Ошибка данных")
-            }
+            val messengerType = messengerTypes[messengerId]
+            check(messengerType != null) { "Ошибка данных" }
+            groupedByMessenger
+                .getOrPut(messengerType) { linkedSetOf() }
+                .add(chatId)
         }
         return groupedByMessenger
     }
@@ -86,5 +69,86 @@ class DatabaseConnect {
             err.printStackTrace() // TODO Переделать на логгер
             false
         }
+    }
+
+    fun getGetSourceId(source: String): Int? {
+        return db.from(GitSources)
+            .select(GitSources.id)
+            .where { GitSources.source eq source }
+            .mapNotNull { it[GitSources.id] }
+            .firstOrNull()
+    }
+
+    fun addGitSource(name: String, source: String): Int {
+        return getGetSourceId(source) ?: db.insertAndGenerateKey(GitSources) {
+            set(GitSources.name, name)
+            set(GitSources.source, source)
+        } as Int
+    }
+
+
+    fun getRepositoryId(sourceId: Int, pathWithNameSpace: String): Int? {
+        return db
+            .from(Repositories)
+            .select(Repositories.id)
+            .where { (Repositories.fullName eq pathWithNameSpace) and (Repositories.gitSourceId eq sourceId) }
+            .mapNotNull { it[Repositories.id] }
+            .firstOrNull()
+    }
+
+    fun addRepository(fullName: String, shortName: String, gitSourceId: Int): Int {
+        return getRepositoryId(gitSourceId, fullName) ?: db.insertAndGenerateKey(Repositories) {
+            set(Repositories.fullName, fullName)
+            set(Repositories.shortName, shortName)
+            set(Repositories.gitSourceId, gitSourceId)
+        } as Int
+    }
+
+
+    fun getMessengerId(type: String): Int? {
+        return db
+            .from(MessengerTypes)
+            .select(MessengerTypes.id)
+            .where { MessengerTypes.name eq type }
+            .mapNotNull { it[MessengerTypes.id] }
+            .firstOrNull()
+    }
+
+    fun addMessengerType(messengerName: String): Int {
+        return getMessengerId(messengerName) ?: db.insertAndGenerateKey(MessengerTypes) {
+            set(MessengerTypes.name, messengerName)
+        } as Int
+    }
+
+    fun getSubscribes(repositoryId: Int): Set<Pair<String, Int>> {
+        return db
+            .from(RepositorySubscribes)
+            .select(listOf(RepositorySubscribes.chatId, RepositorySubscribes.messengerTypeId))
+            .where { RepositorySubscribes.repositoryId eq repositoryId }
+            .mapNotNull {
+                if (it[RepositorySubscribes.chatId] == null || it[RepositorySubscribes.messengerTypeId] != null) null
+                else it[RepositorySubscribes.chatId]!! to it[RepositorySubscribes.messengerTypeId]!!
+            }
+            .toSet()
+    }
+
+    fun addSubscribe(chatId: String, messengerId: Int, repositoryId: Int): Boolean {
+        val countSubscribe = db
+            .from(RepositorySubscribes)
+            .select(RepositorySubscribes.id)
+            .where {
+                (RepositorySubscribes.repositoryId eq repositoryId) and
+                (RepositorySubscribes.messengerTypeId eq messengerId) and
+                (RepositorySubscribes.chatId eq chatId)
+            }.totalRecords
+        if (countSubscribe != 0) {
+            return false
+        }
+        val affectedRows = db.insert(RepositorySubscribes) {
+            set(RepositorySubscribes.chatId, chatId)
+            set(RepositorySubscribes.messengerTypeId, messengerId)
+            set(RepositorySubscribes.repositoryId, repositoryId)
+        }
+        return affectedRows > 0
     }
 }

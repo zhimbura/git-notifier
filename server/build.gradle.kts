@@ -34,6 +34,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("org.postgresql:postgresql:$postgresql_version")
     implementation("org.ktorm:ktorm-core:$ktom_version")
+    implementation("org.ktorm:ktorm-support-mysql:$ktom_version")
     implementation("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:$kotlin_telegram_bot")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinx_serialization_version")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")

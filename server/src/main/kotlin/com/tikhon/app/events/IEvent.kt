@@ -23,31 +23,38 @@ sealed interface IGitEvent : IEvent {
         // TODO добавить название если Pipeline завершился с ошибкой
         // TODO добавить ссылку на Job если Pipeline завершился с ошибкой
         override fun asMessage(): String =
-                "*Status*: ${status.content}\n" +
-                "*Project*: ${project.pathWithNameSpace}\n" +
-                "*Branch*: $branch\n" +
-                "*User(s)*: ${users.joinToString(",") { "${it.name} (@${it.userName})" }}\n" +
-                "*Commit message*: $lastCommitMessage"
+            "*Status*: ${status.content}\n" +
+                    "*Project*: ${project.pathWithNameSpace}\n" +
+                    "*Branch*: $branch\n" +
+                    "*User(s)*: ${users.joinToString(",") { "${it.name} (@${it.userName})" }}\n" +
+                    "*Commit message*: $lastCommitMessage"
     }
 }
 
 sealed interface IMessengerEvent : IEvent {
     val messengerName: String
+    val chatId: String
 
     // TODO По идее с точки зрения архитектуры приложения было бы правильнее делать чтобы добавление события явно требовало реализации в адаптерах
     data class ProjectSubscribeEvent(
         override val messengerName: String,
-        val chatId: String,
+        override val chatId: String,
         val projectSource: GitSource,
         val project: GitProject
     ) : IMessengerEvent
 
     data class ProjectUnsubscribeEvent(
         override val messengerName: String,
-        val chatId: String,
+        override val chatId: String,
         val projectSource: GitSource,
         val project: GitProject
     ) : IMessengerEvent
 
+    data class AliasMakingEvent(
+        override val messengerName: String,
+        override val chatId: String,
+        val alias: String,
+        val gitLong: String
+    ) : IMessengerEvent
 }
 

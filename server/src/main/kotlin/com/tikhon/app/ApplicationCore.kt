@@ -10,8 +10,10 @@ import com.tikhon.app.events.MessengerEventType
 
 class ApplicationCore {
     val connect = DatabaseConnect()
+
     // Получаем уведомление о добавлении проекта, записываем в какой чат какой проект был добавлен
     val telegramAdapter = TelegramAdapter()
+
     init {
         connect.checkConnect()
         telegramAdapter.start()
@@ -21,12 +23,30 @@ class ApplicationCore {
     fun receiveMessengerEvent(event: IMessengerEvent, messenger: MessengerAdapter) {
         when (event) {
             is IMessengerEvent.ProjectSubscribeEvent -> {
-                messenger.sendMessage(event.chatId, "Проект распознан ${event.project}")
-                // TODO добавить в базу гит, проект и подписку
+                val gitSourceId = connect.addGitSource(
+                    event.projectSource.name,
+                    event.projectSource.url
+                )
+                val repositoryId = connect.addRepository(
+                    event.project.pathWithNameSpace,
+                    event.project.name,
+                    gitSourceId
+                )
+                val messengerTypeId = connect.addMessengerType(event.messengerName)
+                val success = connect.addSubscribe(event.chatId, messengerTypeId, repositoryId)
+                if (success) {
+                    messenger.sendMessage(event.chatId, "Проект успешно добавлен. Теперь в этот чат будут отправляться обрабатываемые события этого проекта")
+                } else {
+                    messenger.sendMessage(event.chatId, "Данный проект уже добавлен")
+                }
             }
 
             is IMessengerEvent.ProjectUnsubscribeEvent -> {
+                // TODO Добавить удаление
+            }
 
+            is IMessengerEvent.AliasMakingEvent -> {
+                // TODO Добавить создание линковки логина гита и мессенджера
             }
         }
     }
