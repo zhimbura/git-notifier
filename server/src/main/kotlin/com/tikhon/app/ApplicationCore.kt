@@ -55,7 +55,7 @@ class ApplicationCore {
         when (event) {
             is IGitEvent.PipelineEvent -> {
                 val messengers = connect.getMessagesByRepository(
-                    event.gitSource.name,
+                    event.gitSource.url,
                     event.project.pathWithNameSpace,
                 ) ?: return
 

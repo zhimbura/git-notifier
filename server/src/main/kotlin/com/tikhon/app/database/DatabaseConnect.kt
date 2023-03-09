@@ -126,7 +126,7 @@ class DatabaseConnect {
             .select(listOf(RepositorySubscribes.chatId, RepositorySubscribes.messengerTypeId))
             .where { RepositorySubscribes.repositoryId eq repositoryId }
             .mapNotNull {
-                if (it[RepositorySubscribes.chatId] == null || it[RepositorySubscribes.messengerTypeId] != null) null
+                if (it[RepositorySubscribes.chatId] == null || it[RepositorySubscribes.messengerTypeId] == null) null
                 else it[RepositorySubscribes.chatId]!! to it[RepositorySubscribes.messengerTypeId]!!
             }
             .toSet()
