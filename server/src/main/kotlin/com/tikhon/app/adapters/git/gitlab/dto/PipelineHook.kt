@@ -62,7 +62,7 @@ data class MergeRequest(
     @property:SerialName("merge_status")
     val mergeStatus: String,
     @property:SerialName("detailed_merge_status")
-    val detailedMergeStatus: String,
+    val detailedMergeStatus: String?,
     val url: String
 )
 
