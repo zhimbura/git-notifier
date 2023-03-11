@@ -5,6 +5,8 @@ import com.tikhon.app.events.dto.git.GitSource
 import com.tikhon.app.events.dto.git.GitUser
 import com.tikhon.app.events.dto.git.Status
 
+private const val SPACE = "\n     "
+
 sealed interface IEvent
 
 sealed interface IGitEvent : IEvent {
@@ -23,11 +25,11 @@ sealed interface IGitEvent : IEvent {
         // TODO добавить название если Pipeline завершился с ошибкой
         // TODO добавить ссылку на Job если Pipeline завершился с ошибкой
         override fun asMessage(): String =
-            "*Status*: ${status.content}\n" +
-                    "*Project*: ${project.pathWithNameSpace}\n" +
-                    "*Branch*: $branch\n" +
-                    "*User(s)*: ${users.joinToString(",") { "${it.name} (@${it.userName})" }}\n" +
-                    "*Commit message*: $lastCommitMessage"
+            "Status:$SPACE${status.content}\n" +
+            "Project:$SPACE${project.pathWithNameSpace}\n" +
+            "Branch:$SPACE$branch\n" +
+            "User(s):$SPACE${users.joinToString(SPACE) { "${it.name} (@${it.userName})" }}\n" +
+            "Commit message:$SPACE$lastCommitMessage"
     }
 }
 
@@ -54,7 +56,8 @@ sealed interface IMessengerEvent : IEvent {
         override val messengerName: String,
         override val chatId: String,
         val alias: String,
-        val gitLong: String
+        val gitLong: String,
+        val gitSource: GitSource
     ) : IMessengerEvent
 }
 

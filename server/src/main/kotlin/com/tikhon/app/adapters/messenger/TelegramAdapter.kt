@@ -5,7 +5,6 @@ import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
-import com.github.kotlintelegrambot.entities.ParseMode
 
 val DEV_MSG = """
     В данный момент бот находится в разработке
@@ -13,7 +12,7 @@ val DEV_MSG = """
     Или можете написать мне в личные сообщения @your_rubicon с вопросом чем можно помочь 
 """.trimIndent()
 
-fun createBotAPI(vararg commands: Pair<String, (String, String) -> Unit>) = bot {
+fun createBotAPI(vararg commands: Pair<String, (MessageInfo) -> Unit>) = bot {
     token = System.getenv("TG_API_TOKEN")
     dispatch {
         text {
@@ -30,7 +29,13 @@ fun createBotAPI(vararg commands: Pair<String, (String, String) -> Unit>) = bot 
                     .takeIf { it > -1 }
                     ?: return@command
                 val textWithoutCommand = textMessage.substring(firstSpace + 1).trim()
-                handler(message.chat.id.toString(), textWithoutCommand)
+                handler(
+                    MessageInfo(
+                        chatId = message.chat.id.toString(),
+                        senderLogin = message.from?.username,
+                        message = textWithoutCommand
+                    )
+                )
             }
         }
     }
@@ -41,7 +46,7 @@ class TelegramAdapter : MessengerAdapter("telegram") {
     private val bot = createBotAPI(
         "addproject" to this::addProject,
         "help" to this::todo,
-        "aliasme" to this::todo,
+        "aliasme" to this::addAlias,
         "removeproject" to this::todo,
         "subscribe" to this::todo,
         "unsubscribe" to this::todo,
@@ -55,7 +60,7 @@ class TelegramAdapter : MessengerAdapter("telegram") {
 
     override fun sendMessage(chatId: String, message: String) {
         val chat = chatId.toChatId()
-        bot.sendMessage(chat, message, parseMode = ParseMode.MARKDOWN)
+        bot.sendMessage(chat, message)
     }
 }
 

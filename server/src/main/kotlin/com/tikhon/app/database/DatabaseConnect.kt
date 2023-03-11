@@ -22,7 +22,7 @@ class DatabaseConnect {
 
     fun getMessagesByRepository(gitSource: String, pathWithNameSpace: String): Map<String, Set<String>>? {
         // TODO Оптимизировать запросы
-        val sourceId = getGetSourceId(gitSource)
+        val sourceId = getGetSourceIdBySource(gitSource)
         if (sourceId == null) {
             println("Не найден Git источник")
             return null// TODO Возможно нужно кинуть ошибку ?
@@ -71,7 +71,7 @@ class DatabaseConnect {
         }
     }
 
-    fun getGetSourceId(source: String): Int? {
+    fun getGetSourceIdBySource(source: String): Int? {
         return db.from(GitSources)
             .select(GitSources.id)
             .where { GitSources.source eq source }
@@ -80,7 +80,7 @@ class DatabaseConnect {
     }
 
     fun addGitSource(name: String, source: String): Int {
-        return getGetSourceId(source) ?: db.insertAndGenerateKey(GitSources) {
+        return getGetSourceIdBySource(source) ?: db.insertAndGenerateKey(GitSources) {
             set(GitSources.name, name)
             set(GitSources.source, source)
         } as Int
@@ -132,7 +132,7 @@ class DatabaseConnect {
             .toSet()
     }
 
-    fun addSubscribe(chatId: String, messengerId: Int, repositoryId: Int): Boolean {
+    fun addSubscribe(chatId: String, messengerId: Int, repositoryId: Int): ResultType {
         val countSubscribe = db
             .from(RepositorySubscribes)
             .select(RepositorySubscribes.id)
@@ -142,13 +142,81 @@ class DatabaseConnect {
                 (RepositorySubscribes.chatId eq chatId)
             }.totalRecords
         if (countSubscribe != 0) {
-            return false
+            return ResultType.NO_CHANGE
         }
-        val affectedRows = db.insert(RepositorySubscribes) {
-            set(RepositorySubscribes.chatId, chatId)
-            set(RepositorySubscribes.messengerTypeId, messengerId)
-            set(RepositorySubscribes.repositoryId, repositoryId)
+        return asResultType {
+            db.insert(RepositorySubscribes) {
+                set(RepositorySubscribes.chatId, chatId)
+                set(RepositorySubscribes.messengerTypeId, messengerId)
+                set(RepositorySubscribes.repositoryId, repositoryId)
+            }
         }
-        return affectedRows > 0
+    }
+
+    fun addAlias(gitLogin: String, messengerLogin: String, gitSourceId: Int, messengerTypeId: Int): ResultType {
+        val existAliasesByGit = db
+            .from(Aliases)
+            .select(listOf(Aliases.id, Aliases.messengerLogin, Aliases.messengerTypeId))
+            .where {
+                (Aliases.gitLogin eq gitLogin) and (Aliases.gitSourceId eq gitSourceId)
+            }
+            .mapNotNull {
+                Triple(
+                    it[Aliases.id]!!,
+                    it[Aliases.messengerLogin]!!,
+                    it[Aliases.messengerTypeId]!!
+                )
+            }
+        val hasExistAlias = existAliasesByGit.find { it.third == messengerTypeId }
+        return when {
+            hasExistAlias == null -> {
+                asResultType {
+                    db.insert(Aliases) {
+                        set(Aliases.gitLogin, gitLogin)
+                        set(Aliases.gitSourceId, gitSourceId)
+                        set(Aliases.messengerLogin, messengerLogin)
+                        set(Aliases.messengerTypeId, messengerTypeId)
+                    }
+                }
+            }
+            hasExistAlias.second != messengerLogin -> {
+                asResultType {
+                    db.update(Aliases) {
+                        set(Aliases.messengerLogin, messengerLogin)
+                        where { it.id eq hasExistAlias.first }
+                    }
+                }
+            }
+            else -> ResultType.NO_CHANGE
+        }
+    }
+
+    private fun asResultType(f: () -> Int): ResultType {
+        return try {
+            val affectedRows = f()
+            if (affectedRows > 0) {
+                ResultType.SUCCESS
+            } else {
+                ResultType.NO_CHANGE
+            }
+        } catch (err: Exception) {
+            err.printStackTrace()
+            ResultType.ERROR
+        }
+    }
+
+    fun getAlias(gitLogin: String, gitSource: String, messengerType: String): String? {
+        val gitSourceId = getGetSourceIdBySource(gitSource) ?: return null
+        val messengerId = getMessengerId(messengerType) ?: return null
+        return db
+            .from(Aliases)
+            .select(Aliases.messengerLogin)
+            .where {
+                (Aliases.gitLogin eq gitLogin) and
+                (Aliases.gitSourceId eq gitSourceId) and
+                (Aliases.messengerTypeId eq messengerId)
+            }
+            .mapNotNull { it[Aliases.messengerLogin] }
+            .firstOrNull()
     }
 }

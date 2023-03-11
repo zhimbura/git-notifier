@@ -28,30 +28,56 @@ abstract class MessengerAdapter(val messengerName: String) : EventEmitter<Messen
 
     protected abstract fun beforeStart()
 
-    protected fun addProject(chatId: String, message: String) {
+    protected fun addProject(messageInfo: MessageInfo) {
         val projectSource = try {
-            GitSource.fromURL(message)
+            GitSource.fromURL(messageInfo.message)
         } catch (e: Exception) {
-            sendMessage(chatId, "Невозможно разобрать ссылку на проект, пример правильной ссылки http://gitlab.south.rt.ru/epc/ompo-sdk-kotlin")
+            sendMessage(messageInfo.chatId, "Невозможно разобрать ссылку на проект, пример правильной ссылки http://gitlab.south.rt.ru/epc/ompo-sdk-kotlin")
             return
         }
         val projectInfo = try {
-            GitProject.fromURL(message)
+            GitProject.fromURL(messageInfo.message)
         } catch (e: Exception) {
-            sendMessage(chatId, "Невозможно разобрать ссылку на проект, пример правильной ссылки http://gitlab.south.rt.ru/epc/ompo-sdk-kotlin")
+            sendMessage(messageInfo.chatId, "Невозможно разобрать ссылку на проект, пример правильной ссылки http://gitlab.south.rt.ru/epc/ompo-sdk-kotlin")
             return
         }
         val event = IMessengerEvent.ProjectSubscribeEvent(
             messengerName,
-            chatId,
+            messageInfo.chatId,
             projectSource,
             projectInfo
         )
-        this.emit(MessengerEventType.ADD_PROJECT, event)
+        this.emit(MessengerEventType.NEW_MESSAGE, event)
     }
 
-    protected fun todo(chatId: String, message: String) {
-        sendMessage(chatId, message)
+    protected fun addAlias(messageInfo: MessageInfo) {
+        if (messageInfo.senderLogin == null) {
+            sendMessage(messageInfo.chatId, "Не возможно создать связь пары-логин так как у вас не установлен userName")
+            return
+        }
+        val gitSource = try {
+            GitSource.fromURL(messageInfo.message)
+        } catch (err: Exception) {
+            sendMessage(messageInfo.chatId, "Не удалось прочитать ссылку")
+            return
+        }
+        val regex = Regex("[^/]+\$")
+        val match = regex.find(messageInfo.message)
+        if (match == null || match.groupValues.size != 1 || match.groupValues.last().isEmpty()) {
+            sendMessage(messageInfo.chatId, "Не удалось получить git username")
+            return
+        }
+        val event = IMessengerEvent.AliasMakingEvent(
+            messengerName = messengerName,
+            chatId = messageInfo.chatId,
+            alias = messageInfo.senderLogin,
+            gitLong = match.groupValues.last(),
+            gitSource = gitSource
+        )
+        this.emit(MessengerEventType.NEW_MESSAGE, event)
+    }
+    protected fun todo(messageInfo: MessageInfo) {
+        sendMessage(messageInfo.chatId, "Пока что реализованы функции подписки и создания связи пар-логинов")
     }
 
     companion object {
