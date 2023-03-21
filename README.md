@@ -2,15 +2,17 @@
 
 Перенос проекта с JS версии [gitlab-bot-webhook](https://github.com/Tihon-Ustinov/gitlab-bot-webhook) на Kotlin
 
+TODO: Сохранить баекап базы, пример
+
 ## Суть
 
 Суть бота заключается в том чтобы он мог в телеграммах уведомлять о разных событиях в проекте.
 
 ## Функции
-- [ ] Связать ник телеграм с ником git
+- [x] Связать ник телеграм с ником git
 
 ### GitLab
-- [ ] События GitLab Pipeline
+- [x] События GitLab Pipeline
 - [ ] Событие MergeRequest
 
 ### GitHub
