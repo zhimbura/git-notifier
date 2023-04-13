@@ -39,3 +39,9 @@ dependencies {
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
+
+ktor {
+    fatJar {
+        archiveFileName.set("app.jar")
+    }
+}
