@@ -10,5 +10,8 @@ fun Application.configureRouting() {
         get("/") {
             call.respondText("Hello")
         }
+        get("/health") {
+            call.respondText("ok")
+        }
     }
 }
