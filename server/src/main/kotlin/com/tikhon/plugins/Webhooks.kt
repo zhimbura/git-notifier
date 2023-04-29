@@ -12,6 +12,7 @@ fun Application.webhooks(appCore: ApplicationCore) {
     routing {
         post("/webhooks/gitlab") {
             val bodyRequest: String = call.receiveText()
+
             val event = GitLabAdapter.parseEvent(bodyRequest) // TODO переделать по аналогии с gitlab на event
             if (event != null) {
                 appCore.receiveGitEvent(event)
