@@ -1,5 +1,6 @@
 package com.tikhon.app.events
 
+import com.tikhon.app.adapters.messenger.MessengerType
 import com.tikhon.app.events.dto.git.GitProject
 import com.tikhon.app.events.dto.git.GitSource
 import com.tikhon.app.events.dto.git.GitUser
@@ -34,26 +35,26 @@ sealed interface IGitEvent : IEvent {
 }
 
 sealed interface IMessengerEvent : IEvent {
-    val messengerName: String
+    val messengerName: MessengerType
     val chatId: String
 
     // TODO По идее с точки зрения архитектуры приложения было бы правильнее делать чтобы добавление события явно требовало реализации в адаптерах
     data class ProjectSubscribeEvent(
-        override val messengerName: String,
+        override val messengerName: MessengerType,
         override val chatId: String,
         val projectSource: GitSource,
         val project: GitProject
     ) : IMessengerEvent
 
     data class ProjectUnsubscribeEvent(
-        override val messengerName: String,
+        override val messengerName: MessengerType,
         override val chatId: String,
         val projectSource: GitSource,
         val project: GitProject
     ) : IMessengerEvent
 
     data class AliasMakingEvent(
-        override val messengerName: String,
+        override val messengerName: MessengerType,
         override val chatId: String,
         val alias: String,
         val gitLong: String,

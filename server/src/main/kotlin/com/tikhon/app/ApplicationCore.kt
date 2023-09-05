@@ -11,7 +11,7 @@ import com.tikhon.app.events.MessengerEventType
 import com.tikhon.app.events.dto.git.GitUser
 
 class ApplicationCore {
-    val connect = DatabaseConnect()
+    private val connect = DatabaseConnect()
 
     // Получаем уведомление о добавлении проекта, записываем в какой чат какой проект был добавлен
     val telegramAdapter = TelegramAdapter()

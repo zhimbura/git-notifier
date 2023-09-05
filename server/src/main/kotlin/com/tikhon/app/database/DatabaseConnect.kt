@@ -1,5 +1,6 @@
 package com.tikhon.app.database
 
+import com.tikhon.app.adapters.messenger.MessengerType
 import com.tikhon.app.database.tableobjects.*
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
@@ -20,7 +21,7 @@ class DatabaseConnect {
         require(isValidTables()) { "Ошибка инициализации подключения к базе данных" }
     }
 
-    fun getMessagesByRepository(gitSource: String, pathWithNameSpace: String): Map<String, Set<String>>? {
+    fun getMessagesByRepository(gitSource: String, pathWithNameSpace: String): Map<MessengerType, Set<String>>? {
         // TODO Оптимизировать запросы
         val sourceId = getGetSourceIdBySource(gitSource)
         if (sourceId == null) {
@@ -45,9 +46,9 @@ class DatabaseConnect {
                 .where { MessengerTypes.id eq messengerId }
                 .mapNotNull { messengerId to it[MessengerTypes.name] }
         }.toMap()
-        val groupedByMessenger: LinkedHashMap<String, LinkedHashSet<String>> = linkedMapOf()
+        val groupedByMessenger: LinkedHashMap<MessengerType, LinkedHashSet<String>> = linkedMapOf()
         for ((chatId, messengerId) in subscribers) {
-            val messengerType = messengerTypes[messengerId]
+            val messengerType = messengerTypes[messengerId]?.let { MessengerType.getOrNull(it) }
             check(messengerType != null) { "Ошибка данных" }
             groupedByMessenger
                 .getOrPut(messengerType) { linkedSetOf() }
@@ -105,18 +106,18 @@ class DatabaseConnect {
     }
 
 
-    fun getMessengerId(type: String): Int? {
+    fun getMessengerId(type: MessengerType): Int? {
         return db
             .from(MessengerTypes)
             .select(MessengerTypes.id)
-            .where { MessengerTypes.name eq type }
+            .where { MessengerTypes.name eq type.type }
             .mapNotNull { it[MessengerTypes.id] }
             .firstOrNull()
     }
 
-    fun addMessengerType(messengerName: String): Int {
+    fun addMessengerType(messengerName: MessengerType): Int {
         return getMessengerId(messengerName) ?: db.insertAndGenerateKey(MessengerTypes) {
-            set(MessengerTypes.name, messengerName)
+            set(MessengerTypes.name, messengerName.type)
         } as Int
     }
 
@@ -205,7 +206,7 @@ class DatabaseConnect {
         }
     }
 
-    fun getAlias(gitLogin: String, gitSource: String, messengerType: String): String? {
+    fun getAlias(gitLogin: String, gitSource: String, messengerType: MessengerType): String? {
         val gitSourceId = getGetSourceIdBySource(gitSource) ?: return null
         val messengerId = getMessengerId(messengerType) ?: return null
         return db

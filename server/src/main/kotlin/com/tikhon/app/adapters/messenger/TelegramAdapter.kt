@@ -42,7 +42,7 @@ fun createBotAPI(vararg commands: Pair<String, (MessageInfo) -> Unit>) = bot {
 
 }
 
-class TelegramAdapter : MessengerAdapter("telegram") {
+class TelegramAdapter : MessengerAdapter(MessengerType.TG) {
     private val bot = createBotAPI(
         "addproject" to this::addProject,
         "help" to this::todo,

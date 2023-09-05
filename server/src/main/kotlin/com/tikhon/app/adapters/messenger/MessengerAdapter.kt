@@ -7,7 +7,7 @@ import com.tikhon.app.events.dto.git.GitProject
 import com.tikhon.app.events.dto.git.GitSource
 import java.lang.IllegalStateException
 
-abstract class MessengerAdapter(val messengerName: String) : EventEmitter<MessengerEventType, IMessengerEvent>() {
+abstract class MessengerAdapter(val messengerName: MessengerType) : EventEmitter<MessengerEventType, IMessengerEvent>() {
     private var state: MessengerAdapterState = MessengerAdapterState.CREATED
 
     init {
@@ -81,15 +81,19 @@ abstract class MessengerAdapter(val messengerName: String) : EventEmitter<Messen
     }
 
     companion object {
-        private val adapters: MutableMap<String, MessengerAdapter> = mutableMapOf()
+        private val adapters: MutableMap<MessengerType, MessengerAdapter> = mutableMapOf()
 
-        private fun register(type: String, adapter: MessengerAdapter) {
+        private fun register(type: MessengerType, adapter: MessengerAdapter) {
             require(!adapters.containsKey(type)) { "Адаптеры должны быть созданы только в одном экземпляре" }
             adapters[type] = adapter
         }
 
-        fun getAdapter(type: String) : MessengerAdapter {
+        fun getAdapter(type: MessengerType) : MessengerAdapter {
             return adapters[type] ?: throw IllegalStateException("Попытка получить ре реализованный адаптер")
+        }
+
+        fun getAdapterOrNull(type: MessengerType) : MessengerAdapter? {
+            return adapters[type]
         }
     }
 }
