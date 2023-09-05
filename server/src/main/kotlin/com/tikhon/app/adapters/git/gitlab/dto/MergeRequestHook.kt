@@ -25,5 +25,5 @@ data class MergeRequestHookAttributes(
     val title: String,
     val description: String = "",
     val url: String,
-    val action: String
+    val action: String = "open"
 )
