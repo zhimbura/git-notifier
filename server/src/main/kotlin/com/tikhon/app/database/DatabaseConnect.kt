@@ -20,7 +20,7 @@ class DatabaseConnect {
         require(isValidTables()) { "Ошибка инициализации подключения к базе данных" }
     }
 
-    fun getMessagesByRepository(gitSource: String, pathWithNameSpace: String): Map<String, Set<String>>? {
+    fun getMessengersByRepository(gitSource: String, pathWithNameSpace: String): Map<String, Set<String>>? {
         // TODO Оптимизировать запросы
         val sourceId = getGetSourceIdBySource(gitSource)
         if (sourceId == null) {

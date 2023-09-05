@@ -8,6 +8,7 @@ import com.tikhon.app.database.ResultType.*
 import com.tikhon.app.events.IGitEvent
 import com.tikhon.app.events.IMessengerEvent
 import com.tikhon.app.events.MessengerEventType
+import com.tikhon.app.events.dto.git.GitMergeRequestAction
 import com.tikhon.app.events.dto.git.GitUser
 
 class ApplicationCore {
@@ -82,7 +83,7 @@ class ApplicationCore {
     fun receiveGitEvent(event: IGitEvent) {
         when (event) {
             is IGitEvent.PipelineEvent -> {
-                val messengers = connect.getMessagesByRepository(
+                val messengers = connect.getMessengersByRepository(
                     event.gitSource.url,
                     event.project.pathWithNameSpace,
                 ) ?: return
@@ -91,15 +92,8 @@ class ApplicationCore {
                 for ((type, chats) in messengers.entries) {
                     val messengerAdapter = getAdapter(type)
                     val eventWithAliases = event.copy(
-                        users = event.users.map {
-                            GitUser(
-                                it.name,
-                                connect.getAlias(
-                                    gitLogin = it.userName,
-                                    gitSource = event.gitSource.url,
-                                    messengerType = type
-                                ) ?: it.userName
-                            )
+                        users = event.users.map { gitUser ->
+                            gitUser.copyWithAlias(event.gitSource.url, type)
                         }
                     )
                     for (chatId in chats) {
@@ -107,6 +101,40 @@ class ApplicationCore {
                     }
                 }
             }
+
+            is IGitEvent.MergeRequestEvent -> {
+                if (event.mergeRequest.action != GitMergeRequestAction.OPEN) return
+
+                val messengers = connect.getMessengersByRepository(
+                    event.gitSource.url,
+                    event.project.pathWithNameSpace,
+                ) ?: return
+
+                for ((type, chats) in messengers.entries) {
+                    val messengerAdapter = getAdapter(type)
+                    val eventWithAliases = event.copy(
+                        mergeRequest = event.mergeRequest.copy(
+                            author = event.mergeRequest.author.copyWithAlias(event.gitSource.url, type),
+                            reviewers = event.mergeRequest.reviewers.map { gitUser ->
+                                gitUser.copyWithAlias(event.gitSource.url, type)
+                            }
+                        )
+                    )
+                    for (chatId in chats) {
+                        messengerAdapter.notifyAll(chatId, eventWithAliases.asMessage())
+                    }
+                }
+            }
         }
+    }
+
+    private fun GitUser.copyWithAlias(gitSource: String, messengerType: String): GitUser {
+        return copy(
+            userName = connect.getAlias(
+                gitLogin = userName,
+                gitSource = gitSource,
+                messengerType = messengerType
+            ) ?: userName
+        )
     }
 }

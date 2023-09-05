@@ -26,6 +26,8 @@ abstract class MessengerAdapter(val messengerName: String) : EventEmitter<Messen
 
     abstract fun sendMessage(chatId: String, message: String)
 
+    abstract fun notifyAll(chatId: String, message: String)
+
     protected abstract fun beforeStart()
 
     protected fun addProject(messageInfo: MessageInfo) {

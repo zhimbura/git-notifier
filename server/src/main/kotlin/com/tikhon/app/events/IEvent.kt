@@ -1,9 +1,6 @@
 package com.tikhon.app.events
 
-import com.tikhon.app.events.dto.git.GitProject
-import com.tikhon.app.events.dto.git.GitSource
-import com.tikhon.app.events.dto.git.GitUser
-import com.tikhon.app.events.dto.git.Status
+import com.tikhon.app.events.dto.git.*
 
 private const val SPACE = "\n     "
 
@@ -25,11 +22,41 @@ sealed interface IGitEvent : IEvent {
         // TODO добавить название если Pipeline завершился с ошибкой
         // TODO добавить ссылку на Job если Pipeline завершился с ошибкой
         override fun asMessage(): String =
-            "Status:$SPACE${status.content}\n" +
-            "Project:$SPACE${project.pathWithNameSpace}\n" +
-            "Branch:$SPACE$branch\n" +
-            "User(s):$SPACE${users.joinToString(SPACE) { "${it.name} (@${it.userName})" }}\n" +
-            "Commit message:$SPACE$lastCommitMessage"
+            "*Status*:$SPACE${status.content}\n" +
+            "*Project*:$SPACE${project.pathWithNameSpace}\n" +
+            "*Branch*:$SPACE$branch\n" +
+            "*User(s)*:$SPACE${users.joinToString(SPACE) { "${it.name} (@${it.userName})" }}\n" +
+            "*Commit message*:$SPACE$lastCommitMessage"
+    }
+
+    data class MergeRequestEvent(
+        override val gitSource: GitSource,
+        val project: GitProject,
+        val mergeRequest: GitMergeRequest
+    ) : IGitEvent {
+
+        override fun asMessage() = buildString {
+            appendLine("\uD83D\uDCA1*New merge request*\uD83D\uDCA1\n")
+
+            with(mergeRequest) {
+                appendLine("*Project*:$SPACE[${gitSource.url}](${project.pathWithNameSpace})" +
+                        " ($sourceBranch -> $targetBranch)")
+
+                appendLine("*Title*:$SPACE$title")
+
+                if (description.isNotBlank())
+                    appendLine("*Description*:$SPACE$description")
+
+                if (reviewers.isNotEmpty()) {
+                    val reviewersList = reviewers.joinToString(SPACE) { "${it.name} (@${it.userName})" }
+                    appendLine("*Reviewers*:$SPACE$reviewersList")
+                }
+
+                appendLine("\n*Author*:$SPACE${author.name} (@${author.userName})")
+            }
+
+        }
+
     }
 }
 
