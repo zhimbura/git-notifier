@@ -13,7 +13,7 @@
 
 ### GitLab
 - [x] События GitLab Pipeline
-- [ ] Событие MergeRequest
+- [x] Событие MergeRequest
 
 ### GitHub
 - [ ] События GitHub Action
