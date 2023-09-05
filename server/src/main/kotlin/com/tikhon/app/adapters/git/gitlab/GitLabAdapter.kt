@@ -1,14 +1,12 @@
 package com.tikhon.app.adapters.git.gitlab
 
 import com.tikhon.app.adapters.git.GitAdapter
+import com.tikhon.app.adapters.git.gitlab.dto.MergeRequestHook
 import com.tikhon.app.adapters.git.gitlab.dto.ObjectKind
 import com.tikhon.app.adapters.git.gitlab.dto.ObjectKindType
 import com.tikhon.app.adapters.git.gitlab.dto.PipelineHook
 import com.tikhon.app.events.IGitEvent
-import com.tikhon.app.events.dto.git.GitProject
-import com.tikhon.app.events.dto.git.GitSource
-import com.tikhon.app.events.dto.git.GitUser
-import com.tikhon.app.events.dto.git.Status
+import com.tikhon.app.events.dto.git.*
 import kotlinx.serialization.json.Json
 
 // TODO Переделать на аннотации
@@ -47,6 +45,24 @@ object GitLabAdapter : GitAdapter("GitLab") {
     }
 
     private fun parseMergeRequest(data: String): IGitEvent {
-        TODO("Сформировать и кинуть события в ApplicationCore")
+        val mergeRequestHook = json.decodeFromString(MergeRequestHook.serializer(), data)
+        return IGitEvent.MergeRequestEvent(
+            gitSource = GitSource.fromURL(mergeRequestHook.project.webUrl),
+            project = GitProject(
+                name = mergeRequestHook.project.name,
+                namespace = mergeRequestHook.project.namespace,
+                pathWithNameSpace = mergeRequestHook.project.pathWithNamespace,
+            ),
+            mergeRequest = GitMergeRequest(
+                title = mergeRequestHook.attributes.title,
+                description = mergeRequestHook.attributes.description,
+                url = mergeRequestHook.attributes.url,
+                action = GitMergeRequestAction.fromString(mergeRequestHook.attributes.action),
+                sourceBranch = mergeRequestHook.attributes.sourceBranch,
+                targetBranch = mergeRequestHook.attributes.targetBranch,
+                author = mergeRequestHook.user.let { GitUser(it.name, it.username) },
+                reviewers = mergeRequestHook.reviewers.map { GitUser(it.name, it.username) }
+            )
+        )
     }
 }

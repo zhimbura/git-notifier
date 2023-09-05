@@ -1,5 +1,7 @@
 package com.tikhon.app.adapters.git.gitlab.dto
 
+import com.tikhon.app.adapters.git.gitlab.dto.common.Project
+import com.tikhon.app.adapters.git.gitlab.dto.common.User
 import io.ktor.http.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -7,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PipelineHook(
     @property:SerialName("object_attributes")
-    val objectAttributes: ObjectAttributes,
+    val objectAttributes: PipelineHookAttributes,
     @property:SerialName("merge_request")
     val mergeRequest: MergeRequest? = null,
     val user: User,
@@ -20,7 +22,7 @@ data class PipelineHook(
 
 
 @Serializable
-data class ObjectAttributes(
+data class PipelineHookAttributes(
     val id: Int,
     val iid: Int? = null,
     val ref: String,
@@ -64,37 +66,6 @@ data class MergeRequest(
     @property:SerialName("detailed_merge_status")
     val detailedMergeStatus: String? = null,
     val url: String
-)
-
-@Serializable
-data class User(
-    val id: Int,
-    val name: String,
-    val username: String,
-    val avatar_url: String,
-    val email: String
-)
-
-@Serializable
-data class Project(
-    val id: Int,
-    val name: String,
-    val description: String,
-    @property:SerialName("web_url")
-    val webUrl: String,
-    @property:SerialName("avatar_url")
-    val avatarURL: String? = null,
-    @property:SerialName("git_ssh_url")
-    val gitSHH: String,
-    @property:SerialName("git_http_url")
-    val gitHTTP: String,
-    val namespace: String,
-    @property:SerialName("visibility_level")
-    val visibilityLevel: Int,
-    @property:SerialName("path_with_namespace")
-    val pathWithNamespace: String,
-    @property:SerialName("default_branch")
-    val defaultBranch: String
 )
 
 @Serializable
