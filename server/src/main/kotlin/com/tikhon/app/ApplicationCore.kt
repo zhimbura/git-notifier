@@ -2,7 +2,8 @@ package com.tikhon.app
 
 import com.tikhon.app.adapters.messenger.MessengerAdapter
 import com.tikhon.app.adapters.messenger.MessengerAdapter.Companion.getAdapter
-import com.tikhon.app.adapters.messenger.TelegramAdapter
+import com.tikhon.app.adapters.messenger.getMessageBuilder
+import com.tikhon.app.adapters.messenger.telegram.TelegramAdapter
 import com.tikhon.app.database.DatabaseConnect
 import com.tikhon.app.database.ResultType.*
 import com.tikhon.app.events.IGitEvent
@@ -96,8 +97,9 @@ class ApplicationCore {
                             gitUser.copyWithAlias(event.gitSource.url, type)
                         }
                     )
+                    val messageBuilder = getMessageBuilder(messengerAdapter)
                     for (chatId in chats) {
-                        messengerAdapter.sendMessage(chatId, eventWithAliases.asMessage())
+                        messengerAdapter.sendMessage(chatId, eventWithAliases.asMessage(messageBuilder))
                     }
                 }
             }
@@ -120,8 +122,9 @@ class ApplicationCore {
                             }
                         )
                     )
+                    val messageBuilder = getMessageBuilder(messengerAdapter)
                     for (chatId in chats) {
-                        messengerAdapter.notifyAll(chatId, eventWithAliases.asMessage())
+                        messengerAdapter.notifyAll(chatId, eventWithAliases.asMessage(messageBuilder))
                     }
                 }
             }

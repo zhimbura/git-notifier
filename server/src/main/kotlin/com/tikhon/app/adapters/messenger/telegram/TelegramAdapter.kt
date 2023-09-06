@@ -1,11 +1,12 @@
-package com.tikhon.app.adapters.messenger
+package com.tikhon.app.adapters.messenger.telegram
 
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.command
-import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.ParseMode
+import com.tikhon.app.adapters.messenger.MessageInfo
+import com.tikhon.app.adapters.messenger.MessengerAdapter
 
 val DEV_MSG = """
     В данный момент бот находится в разработке
@@ -16,20 +17,11 @@ val DEV_MSG = """
 fun createBotAPI(vararg commands: Pair<String, (MessageInfo) -> Unit>) = bot {
     token = System.getenv("TG_API_TOKEN")
     dispatch {
-        text {
-            if (commands.none { (key, _) -> message.text?.startsWith("/$key") == true }) {
-                bot.sendMessage(ChatId.fromId(message.chat.id), text = DEV_MSG)
-            }
-        }
         for ((cmdName, handler) in commands) {
             this.command(cmdName) {
                 val textMessage = this.message.text
                     ?: return@command // TODO вместо return
-                val firstSpace = textMessage
-                    .indexOf(' ')
-                    .takeIf { it > -1 }
-                    ?: return@command
-                val textWithoutCommand = textMessage.substring(firstSpace + 1).trim()
+                val textWithoutCommand = textMessage.substringAfter(' ', "").trim()
                 handler(
                     MessageInfo(
                         chatId = message.chat.id.toString(),
@@ -61,12 +53,12 @@ class TelegramAdapter : MessengerAdapter("telegram") {
 
     override fun sendMessage(chatId: String, message: String) {
         val chat = chatId.toChatId()
-        bot.sendMessage(chat, message, ParseMode.MARKDOWN)
+        bot.sendMessage(chat, message, ParseMode.HTML)
     }
 
     override fun notifyAll(chatId: String, message: String) {
         val chat = chatId.toChatId()
-        bot.sendMessage(chat, message, ParseMode.MARKDOWN)
+        bot.sendMessage(chat, message, ParseMode.HTML)
             .fold(
                 ifSuccess = { msg -> bot.pinChatMessage(chat, msg.messageId) },
                 ifError = {}

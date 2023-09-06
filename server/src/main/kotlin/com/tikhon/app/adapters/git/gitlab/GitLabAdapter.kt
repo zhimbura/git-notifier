@@ -12,7 +12,10 @@ import kotlinx.serialization.json.Json
 // TODO Переделать на аннотации
 // Типа такого @GitAdapter("GitLab")
 object GitLabAdapter : GitAdapter("GitLab") {
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json {
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+    }
 
     override fun parseEvent(data: String): IGitEvent? {
         val kind = try {

@@ -1,5 +1,6 @@
 package com.tikhon.app.adapters.messenger
 
+import com.tikhon.app.adapters.messenger.telegram.DEV_MSG
 import com.tikhon.app.events.EventEmitter
 import com.tikhon.app.events.IMessengerEvent
 import com.tikhon.app.events.MessengerEventType
@@ -79,7 +80,7 @@ abstract class MessengerAdapter(val messengerName: String) : EventEmitter<Messen
         this.emit(MessengerEventType.NEW_MESSAGE, event)
     }
     protected fun todo(messageInfo: MessageInfo) {
-        sendMessage(messageInfo.chatId, "Пока что реализованы функции подписки и создания связи пар-логинов")
+        sendMessage(messageInfo.chatId, DEV_MSG)
     }
 
     companion object {
