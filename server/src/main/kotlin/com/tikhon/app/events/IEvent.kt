@@ -1,14 +1,13 @@
 package com.tikhon.app.events
 
+import com.tikhon.app.adapters.messenger.MessageBuilder
 import com.tikhon.app.events.dto.git.*
-
-private const val SPACE = "\n     "
 
 sealed interface IEvent
 
 sealed interface IGitEvent : IEvent {
     val gitSource: GitSource
-    fun asMessage(): String
+    fun asMessage(builder: MessageBuilder): String
 
     data class PipelineEvent(
         override val gitSource: GitSource,
@@ -21,12 +20,22 @@ sealed interface IGitEvent : IEvent {
         // TODO добавить ссылку на Pipeline
         // TODO добавить название если Pipeline завершился с ошибкой
         // TODO добавить ссылку на Job если Pipeline завершился с ошибкой
-        override fun asMessage(): String =
-            "*Status*:$SPACE${status.content}\n" +
-            "*Project*:$SPACE${project.pathWithNameSpace}\n" +
-            "*Branch*:$SPACE$branch\n" +
-            "*User(s)*:$SPACE${users.joinToString(SPACE) { "${it.name} (@${it.userName})" }}\n" +
-            "*Commit message*:$SPACE$lastCommitMessage"
+        override fun asMessage(builder: MessageBuilder) = builder.buildMessage {
+            appendLine(bold("Status:"))
+            appendLine(indent(escape(status.content)))
+
+            appendLine(bold("Project:"))
+            appendLine(indent(escape(project.pathWithNameSpace)))
+
+            appendLine(bold("Branch:"))
+            appendLine(indent(escape(branch)))
+
+            appendLine(bold("User(s)"))
+            appendLine(indent(escape(users.joinToString("\n$indent") { "${it.name} (@${it.userName})" })))
+
+            appendLine(bold("Commit message:"))
+            appendLine(indent(escape(lastCommitMessage)))
+        }
     }
 
     data class MergeRequestEvent(
@@ -35,24 +44,29 @@ sealed interface IGitEvent : IEvent {
         val mergeRequest: GitMergeRequest
     ) : IGitEvent {
 
-        override fun asMessage() = buildString {
-            appendLine("\uD83D\uDCA1*New merge request*\uD83D\uDCA1\n")
+        override fun asMessage(builder: MessageBuilder) = builder.buildMessage {
+            appendLine("\uD83D\uDCA1${bold("New merge request")}\uD83D\uDCA1\n")
 
             with(mergeRequest) {
-                appendLine("*Project*:$SPACE[${gitSource.url}](${project.pathWithNameSpace})" +
-                        " ($sourceBranch -> $targetBranch)")
+                appendLine(bold("Project:"))
+                appendLine(indent(escape("${project.pathWithNameSpace} ($sourceBranch -> $targetBranch)")))
 
-                appendLine("*Title*:$SPACE$title")
+                appendLine(bold("Title:"))
+                appendLine(indent(link(title, mergeRequest.url)))
 
-                if (description.isNotBlank())
-                    appendLine("*Description*:$SPACE$description")
-
-                if (reviewers.isNotEmpty()) {
-                    val reviewersList = reviewers.joinToString(SPACE) { "${it.name} (@${it.userName})" }
-                    appendLine("*Reviewers*:$SPACE$reviewersList")
+                if (description.isNotBlank()) {
+                    appendLine(bold("Description:"))
+                    appendLine(indent(escape(description)))
                 }
 
-                appendLine("\n*Author*:$SPACE${author.name} (@${author.userName})")
+                if (reviewers.isNotEmpty()) {
+                    val reviewersList = reviewers.joinToString("\n$indent") { "${it.name} (@${it.userName})" }
+                    appendLine(bold("Reviewers:"))
+                    appendLine(indent(escape(reviewersList)))
+                }
+
+                appendLine(bold("\nAuthor:"))
+                appendLine(indent(escape("${author.name} (@${author.userName})")))
             }
 
         }
