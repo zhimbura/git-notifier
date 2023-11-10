@@ -52,7 +52,7 @@ sealed interface IGitEvent : IEvent {
                 appendLine(indent(escape("${project.pathWithNameSpace} ($sourceBranch -> $targetBranch)")))
 
                 appendLine(bold("Title:"))
-                appendLine(indent(link(title, mergeRequest.url)))
+                appendLine(indent(link(escape(title), mergeRequest.url)))
 
                 if (description.isNotBlank()) {
                     appendLine(bold("Description:"))
