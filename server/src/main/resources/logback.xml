@@ -1,4 +1,5 @@
 <configuration>
+    <property name="enableLogs" value="${ENABLE_LOGS:-true}"/>
     <property name="stand" value="${NOTIFIER_STAND:-LOCAL}"/>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -19,17 +20,19 @@
         </encoder>
     </appender>
 
-    <if condition='property("stand").contains("PROD")'>
-        <then>
-            <root level="INFO">
-                <appender-ref ref="FILE_ALL"/>
-            </root>
-        </then>
-        <else>
-            <root level="ALL">
-                <appender-ref ref="STDOUT"/>
-            </root>
-        </else>
+    <if condition='property("enableLogs") == "true"'>
+        <if condition='property("stand").contains("PROD")'>
+            <then>
+                <root level="INFO">
+                    <appender-ref ref="FILE_ALL"/>
+                </root>
+            </then>
+            <else>
+                <root level="ALL">
+                    <appender-ref ref="STDOUT"/>
+                </root>
+            </else>
+        </if>
     </if>
 
     <logger name="org.eclipse.jetty" level="INFO"/>
