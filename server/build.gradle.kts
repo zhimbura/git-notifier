@@ -5,6 +5,7 @@ val ktom_version: String by project
 val postgresql_version: String by project
 val kotlinx_serialization_version: String by project
 val kotlin_telegram_bot: String by project
+val janino_version: String by project
 
 plugins {
     kotlin("jvm") version "1.7.22"
@@ -32,6 +33,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-cio-jvm:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("org.codehaus.janino:janino:$janino_version")
     implementation("org.postgresql:postgresql:$postgresql_version")
     implementation("org.ktorm:ktorm-core:$ktom_version")
     implementation("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:$kotlin_telegram_bot")
