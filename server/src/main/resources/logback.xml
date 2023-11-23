@@ -1,4 +1,5 @@
 <configuration>
+    <property name="stand" value="${NOTIFIER_STAND:-LOCAL}"/>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
@@ -11,16 +12,26 @@
         <file>logs/all.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>logs/all.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>14</maxHistory>
+            <maxHistory>2</maxHistory>
         </rollingPolicy>
         <encoder>
             <pattern>%d{MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-    <root level="TRACE">
-        <appender-ref ref="STDOUT"/>
-<!--        <appender-ref ref="FILE_ALL"/>-->
-    </root>
+
+    <if condition='property("stand").contains("PROD")'>
+        <then>
+            <root level="INFO">
+                <appender-ref ref="FILE_ALL"/>
+            </root>
+        </then>
+        <else>
+            <root level="ALL">
+                <appender-ref ref="STDOUT"/>
+            </root>
+        </else>
+    </if>
+
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="io.netty" level="INFO"/>
 </configuration>
