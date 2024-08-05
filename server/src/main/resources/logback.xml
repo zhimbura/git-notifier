@@ -19,26 +19,28 @@
             <pattern>%d{MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-
-    <if condition='property("enableLogs").contains("true")'>
-        <then>
-            <if condition='property("stand").contains("PROD")'>
-                <then>
-                    <root level="INFO">
-                        <appender-ref ref="FILE_ALL"/>
-                    </root>
-                </then>
-                <else>
-                    <root level="ALL">
-                        <appender-ref ref="STDOUT"/>
-                    </root>
-                </else>
-            </if>
-        </then>
-        <else>
-            <root level="OFF"/>
-        </else>
-    </if>
+    <root level="ALL">
+        <appender-ref ref="STDOUT"/>
+    </root>
+<!--    <if condition='property("enableLogs").contains("true")'>-->
+<!--        <then>-->
+<!--            <if condition='property("stand").contains("PROD")'>-->
+<!--                <then>-->
+<!--                    <root level="INFO">-->
+<!--                        <appender-ref ref="FILE_ALL"/>-->
+<!--                    </root>-->
+<!--                </then>-->
+<!--                <else>-->
+<!--                    <root level="ALL">-->
+<!--                        <appender-ref ref="STDOUT"/>-->
+<!--                    </root>-->
+<!--                </else>-->
+<!--            </if>-->
+<!--        </then>-->
+<!--        <else>-->
+<!--            <root level="OFF"/>-->
+<!--        </else>-->
+<!--    </if>-->
 
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="io.netty" level="INFO"/>

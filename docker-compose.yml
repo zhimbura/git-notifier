@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: server
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      APP_PORT: 80
+      APP_HOST: 0.0.0.0
+      DB_PORT: 8091
+      DB_USER: bit_admin
+      DB_NAME: bot_pipeline_notifier_db
+      DB_HOST: db
+      DB_SCHEMA: public
+      DB_PASSWORD: 1234
+      TG_API_TOKEN: ${YOUR_TOKEN}
+      TG_ADMIN_ID: -1001409682272
+      TG_ADMIN_USERNAME: zhimbura
+      ENABLE_LOGS: true
+      NOTIFIER_STAND: LOCAL
+    depends_on:
+      - db
+
+  db:
+    build:
+      context: database
+      dockerfile: Dockerfile
+    ports:
+      - "8091:5432"
+    environment:
+      POSTGRES_USER: bit_admin
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: bot_pipeline_notifier_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

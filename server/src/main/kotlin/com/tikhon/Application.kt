@@ -12,8 +12,10 @@ private val PORT = System.getenv("APP_PORT").toInt()
 private val HOST = System.getenv("APP_HOST")
 
 fun main() {
+    println("Starting server...")
     embeddedServer(CIO, port = PORT, host = HOST, module = Application::module)
         .start(wait = true)
+    println("Server started.")
 }
 
 fun Application.module() {
