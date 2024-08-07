@@ -6,8 +6,6 @@ import io.ktor.server.engine.*
 import io.ktor.server.cio.*
 import com.tikhon.plugins.*
 
-private val appCore = ApplicationCore()
-
 private val PORT = System.getenv("APP_PORT").toInt()
 private val HOST = System.getenv("APP_HOST")
 
@@ -19,7 +17,7 @@ fun main() {
 }
 
 fun Application.module() {
-    webhooks(appCore)
+    webhooks(ApplicationCore())
     configureSerialization()
     configureRouting()
 }

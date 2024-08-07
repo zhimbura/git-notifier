@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   app:
+    container_name: notifier_server
     build:
       context: server
       dockerfile: Dockerfile
@@ -10,12 +11,12 @@ services:
     environment:
       APP_PORT: 80
       APP_HOST: 0.0.0.0
-      DB_PORT: 8091
+      DB_PORT: 5432
       DB_USER: bit_admin
       DB_NAME: bot_pipeline_notifier_db
       DB_HOST: db
       DB_SCHEMA: public
-      DB_PASSWORD: 1234
+      DB_PASSWORD: Password1!
       TG_API_TOKEN: ${YOUR_TOKEN}
       TG_ADMIN_ID: -1001409682272
       TG_ADMIN_USERNAME: zhimbura
@@ -25,6 +26,7 @@ services:
       - db
 
   db:
+    container_name: notifier_db
     build:
       context: database
       dockerfile: Dockerfile
@@ -32,7 +34,7 @@ services:
       - "8091:5432"
     environment:
       POSTGRES_USER: bit_admin
-      POSTGRES_PASSWORD: 1234
+      POSTGRES_PASSWORD: Password1!
       POSTGRES_DB: bot_pipeline_notifier_db
     volumes:
       - db_data:/var/lib/postgresql/data

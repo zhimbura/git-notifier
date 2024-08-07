@@ -33,7 +33,7 @@ CREATE TABLE public.t_aliases (
 );
 
 
-ALTER TABLE public.t_aliases OWNER TO bit_admin;
+ALTER TABLE public.t_aliases OWNER TO CURRENT_USER;
 
 --
 -- Name: t_aliases_id_seq; Type: SEQUENCE; Schema: public; Owner: bit_admin
@@ -60,7 +60,7 @@ CREATE TABLE public.t_git_sources (
 );
 
 
-ALTER TABLE public.t_git_sources OWNER TO bit_admin;
+ALTER TABLE public.t_git_sources OWNER TO CURRENT_USER;
 
 --
 -- Name: TABLE t_git_sources; Type: COMMENT; Schema: public; Owner: bit_admin
@@ -82,7 +82,7 @@ CREATE SEQUENCE public.t_git_sources_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.t_git_sources_id_seq OWNER TO bit_admin;
+ALTER TABLE public.t_git_sources_id_seq OWNER TO CURRENT_USER;
 
 --
 -- Name: t_git_sources_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: bit_admin
@@ -101,7 +101,7 @@ CREATE TABLE public.t_messenger_type (
 );
 
 
-ALTER TABLE public.t_messenger_type OWNER TO bit_admin;
+ALTER TABLE public.t_messenger_type OWNER TO CURRENT_USER;
 
 --
 -- Name: t_messenger_type_id_seq; Type: SEQUENCE; Schema: public; Owner: bit_admin
@@ -116,7 +116,7 @@ CREATE SEQUENCE public.t_messenger_type_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.t_messenger_type_id_seq OWNER TO bit_admin;
+ALTER TABLE public.t_messenger_type_id_seq OWNER TO CURRENT_USER;
 
 --
 -- Name: t_messenger_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: bit_admin
@@ -137,7 +137,7 @@ CREATE TABLE public.t_repositories (
 );
 
 
-ALTER TABLE public.t_repositories OWNER TO bit_admin;
+ALTER TABLE public.t_repositories OWNER TO CURRENT_USER;
 
 --
 -- Name: t_repositories_id_seq; Type: SEQUENCE; Schema: public; Owner: bit_admin
@@ -152,7 +152,7 @@ CREATE SEQUENCE public.t_repositories_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.t_repositories_id_seq OWNER TO bit_admin;
+ALTER TABLE public.t_repositories_id_seq OWNER TO CURRENT_USER;
 
 --
 -- Name: t_repositories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: bit_admin
@@ -173,7 +173,7 @@ CREATE TABLE public.t_repository_subscribes (
 );
 
 
-ALTER TABLE public.t_repository_subscribes OWNER TO bit_admin;
+ALTER TABLE public.t_repository_subscribes OWNER TO CURRENT_USER;
 
 --
 -- Name: t_repository_subscribes_id_seq; Type: SEQUENCE; Schema: public; Owner: bit_admin
@@ -188,7 +188,7 @@ CREATE SEQUENCE public.t_repository_subscribes_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.t_repository_subscribes_id_seq OWNER TO bit_admin;
+ALTER TABLE public.t_repository_subscribes_id_seq OWNER TO CURRENT_USER;
 
 --
 -- Name: t_repository_subscribes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: bit_admin
