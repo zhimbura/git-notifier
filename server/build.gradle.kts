@@ -1,20 +1,13 @@
-val ktor_version: String by project
-val kotlin_version: String by project
-val logback_version: String by project
-val ktom_version: String by project
-val postgresql_version: String by project
-val kotlinx_serialization_version: String by project
-val kotlin_telegram_bot: String by project
-val janino_version: String by project
+// Версии и зависимости теперь вынесены в версионный каталог (libs.versions.toml)
 
 plugins {
-    kotlin("jvm") version "2.0.0"
-    id("io.ktor.plugin") version "2.3.12"
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.20-RC"
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.ktor)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 group = "com.tikhon"
-version = "0.0.1"
+version = "0.0.2"
 application {
     mainClass.set("com.tikhon.ApplicationKt")
 
@@ -22,24 +15,21 @@ application {
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
-repositories {
-    mavenCentral()
-    maven("https://jitpack.io")
-}
+
 
 dependencies {
-    implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
-    implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktor_version")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version")
-    implementation("io.ktor:ktor-server-cio-jvm:$ktor_version")
-    implementation("ch.qos.logback:logback-classic:$logback_version")
-    implementation("org.codehaus.janino:janino:$janino_version")
-    implementation("org.postgresql:postgresql:$postgresql_version")
-    implementation("org.ktorm:ktorm-core:$ktom_version")
-    implementation("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:$kotlin_telegram_bot")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinx_serialization_version")
-    testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.content.negotiation)
+    implementation(libs.ktor.serialization)
+    implementation(libs.ktor.server.cio)
+    implementation(libs.logback.classic)
+    implementation(libs.janino)
+    implementation(libs.postgresql)
+    implementation(libs.ktorm.core)
+    implementation(libs.kotlin.telegram.bot)
+    implementation(libs.kotlinx.serialization.core)
+//    testImplementation(libs.ktor.server.tests.jvm) // TODO Для теста еще нет соответствующей версии
+    testImplementation(libs.kotlin.test.junit)
 }
 
 ktor {
