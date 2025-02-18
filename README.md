@@ -1,3 +1,5 @@
+[![Docker Pulls](https://img.shields.io/docker/pulls/ustinovtikhon/notifier-server.svg)](https://hub.docker.com/r/ustinovtikhon/notifier-server)
+
 # Telegram бот для уведомлений
 
 Перенос проекта с JS версии [gitlab-bot-webhook](https://github.com/Tihon-Ustinov/gitlab-bot-webhook) на Kotlin
@@ -23,4 +25,4 @@
 - Создать базу данных PostgreSQL на основании бекапа `database/dump.sql`
 - Добавить переменные окружения указанные в файле `.env`
 - Запустить server как обычный ktor-server проект
-- Должно заработать 
+- Должно заработать
