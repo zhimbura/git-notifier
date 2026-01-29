@@ -20,19 +20,19 @@ docker push "cr.yandex/$REGISTRY_ID/$CONTAINER_NAME:$IMAGE_TAG"
 echo "Creating/updating serverless container..."
 yc serverless container create --name "$CONTAINER_NAME" 2>/dev/null || true
 
+# Создать контейнер, если ещё нет: yc serverless container create --name "$CONTAINER_NAME"
 yc serverless container revision deploy \
   --container-name "$CONTAINER_NAME" \
   --image "cr.yandex/$REGISTRY_ID/$CONTAINER_NAME:$IMAGE_TAG" \
-  --memory 256M \
+  --memory 256MB \
   --cores 1 \
   --concurrency 1 \
-  --service-account-id "${SA_ID:-}" \
+  --runtime http \
   --environment "APP_PORT=8080" \
   --environment "APP_HOST=0.0.0.0" \
   --environment "YDB_CONNECTION_STRING=${YDB_CONNECTION_STRING}" \
   --environment "TG_API_TOKEN=${TG_API_TOKEN}" \
   --environment "TG_ADMIN_USERNAME=${TG_ADMIN_USERNAME:-zhimbura}" \
-  --min-instances 0 \
-  --max-instances 1
+  --min-instances 0
 
-echo "Done. Set REGISTRY_ID and (optionally) SA_ID, YDB_CONNECTION_STRING, TG_API_TOKEN, TG_ADMIN_USERNAME before running."
+echo "Done. Перед запуском задайте: REGISTRY_ID, YDB_CONNECTION_STRING, TG_API_TOKEN, TG_ADMIN_USERNAME (опционально SA_ID)."
