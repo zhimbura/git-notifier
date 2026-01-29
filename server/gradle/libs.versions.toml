@@ -2,8 +2,7 @@
 kotlin = "2.1.10"
 ktor = "3.1.0"
 logback = "1.5.16"
-ktorm = "4.1.1"
-postgresql = "42.7.5"
+ydb = "2.3.15"
 serialization = "1.8.0"
 telegram = "6.3.0"
 janino = "3.1.12"
@@ -15,8 +14,8 @@ ktor-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json-jvm", v
 ktor-server-cio = { module = "io.ktor:ktor-server-cio-jvm", version.ref = "ktor" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 janino = { module = "org.codehaus.janino:janino", version.ref = "janino" }
-postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
-ktorm-core = { module = "org.ktorm:ktorm-core", version.ref = "ktorm" }
+ydb-sdk-core = { module = "tech.ydb:ydb-sdk-core", version.ref = "ydb" }
+ydb-sdk-table = { module = "tech.ydb:ydb-sdk-table", version.ref = "ydb" }
 kotlin-telegram-bot = { module = "io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram", version.ref = "telegram" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "serialization" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }

@@ -24,8 +24,8 @@ dependencies {
     implementation(libs.ktor.server.cio)
     implementation(libs.logback.classic)
     implementation(libs.janino)
-    implementation(libs.postgresql)
-    implementation(libs.ktorm.core)
+    implementation(libs.ydb.sdk.core)
+    implementation(libs.ydb.sdk.table)
     implementation(libs.kotlin.telegram.bot)
     implementation(libs.kotlinx.serialization.core)
 //    testImplementation(libs.ktor.server.tests.jvm) // TODO Для теста еще нет соответствующей версии

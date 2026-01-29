@@ -1,0 +1,55 @@
+-- YDB schema for git-notifier (run manually: ydb -e <endpoint> -d <database> scheme run ydb_schema.yql)
+-- Or create tables in Yandex Cloud Console
+
+CREATE TABLE id_sequences (
+    table_name Utf8 NOT NULL,
+    next_id Int64 NOT NULL,
+    PRIMARY KEY (table_name)
+);
+
+CREATE TABLE t_messenger_type (
+    id Int64 NOT NULL,
+    name Utf8 NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE t_git_sources (
+    id Int64 NOT NULL,
+    name Utf8 NOT NULL,
+    source Utf8 NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE t_repositories (
+    id Int64 NOT NULL,
+    full_name Utf8 NOT NULL,
+    short_name Utf8 NOT NULL,
+    git_source_id Int64 NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE t_repository_subscribes (
+    id Int64 NOT NULL,
+    chat_id Utf8 NOT NULL,
+    messenger_type_id Int64 NOT NULL,
+    repository_id Int64 NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE t_aliases (
+    id Int64 NOT NULL,
+    git_login Utf8 NOT NULL,
+    messenger_login Utf8 NOT NULL,
+    git_source_id Int64 NOT NULL,
+    messenger_type_id Int64 NOT NULL,
+    PRIMARY KEY (id)
+);
+
+-- Initial sequence values and default messenger type
+INSERT INTO id_sequences (table_name, next_id) VALUES ("t_messenger_type", 1);
+INSERT INTO id_sequences (table_name, next_id) VALUES ("t_git_sources", 1);
+INSERT INTO id_sequences (table_name, next_id) VALUES ("t_repositories", 1);
+INSERT INTO id_sequences (table_name, next_id) VALUES ("t_repository_subscribes", 1);
+INSERT INTO id_sequences (table_name, next_id) VALUES ("t_aliases", 1);
+
+INSERT INTO t_messenger_type (id, name) VALUES (1, "telegram");

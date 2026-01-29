@@ -1,5 +1,8 @@
 version: '3.8'
 
+# БД: YDB. Строку подключения задайте в YDB_CONNECTION_STRING
+# (локально: grpc://host.docker.internal:2136/local или свой endpoint)
+
 services:
   app:
     container_name: notifier_server
@@ -9,35 +12,10 @@ services:
     ports:
       - "8080:8080"
     environment:
-      APP_PORT: 80
+      APP_PORT: "8080"
       APP_HOST: 0.0.0.0
-      DB_PORT: 5432
-      DB_USER: bit_admin
-      DB_NAME: bot_pipeline_notifier_db
-      DB_HOST: db
-      DB_SCHEMA: public
-      DB_PASSWORD: Password1!
-      TG_API_TOKEN: ${YOUR_TOKEN}
-      TG_ADMIN_ID: -1001409682272
-      TG_ADMIN_USERNAME: zhimbura
-      ENABLE_LOGS: true
+      YDB_CONNECTION_STRING: ${YDB_CONNECTION_STRING:-grpc://host.docker.internal:2136/local}
+      TG_API_TOKEN: ${TG_API_TOKEN}
+      TG_ADMIN_USERNAME: ${TG_ADMIN_USERNAME:-zhimbura}
+      ENABLE_LOGS: "true"
       NOTIFIER_STAND: LOCAL
-    depends_on:
-      - db
-
-  db:
-    container_name: notifier_db
-    build:
-      context: database
-      dockerfile: Dockerfile
-    ports:
-      - "8091:5432"
-    environment:
-      POSTGRES_USER: bit_admin
-      POSTGRES_PASSWORD: Password1!
-      POSTGRES_DB: bot_pipeline_notifier_db
-    volumes:
-      - db_data:/var/lib/postgresql/data
-
-volumes:
-  db_data:

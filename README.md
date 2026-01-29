@@ -21,8 +21,16 @@
 - [ ] События GitHub Action
 - [ ] События PullRequest
 
-Для запуска
-- Создать базу данных PostgreSQL на основании бекапа `database/dump.sql`
-- Добавить переменные окружения указанные в файле `.env`
-- Запустить server как обычный ktor-server проект
-- Должно заработать
+## Запуск
+
+### Локально / Docker
+- Создать базу YDB (Yandex Cloud или локальную) и выполнить схему `database/ydb_schema.yql`
+- Добавить переменные окружения (см. `.env.example`):
+  - `YDB_CONNECTION_STRING` — строка подключения к YDB (например `grpc://localhost:2136/local` или `grpcs://ydb.serverless.yandexcloud.net:2135/ru-central1/...`)
+  - `APP_HOST`, `APP_PORT` — хост и порт сервера
+  - `TG_BOT_TOKEN` — токен Telegram-бота
+  - `TG_ADMIN_USERNAME` — username администратора
+- Запустить server как обычный Ktor-проект или через Docker
+
+### Yandex Serverless Containers
+См. раздел «Деплой» в репозитории и скрипт `deploy/serverless.sh` (если есть).

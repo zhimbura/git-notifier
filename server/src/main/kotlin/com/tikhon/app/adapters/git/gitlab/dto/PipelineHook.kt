@@ -25,6 +25,7 @@ data class PipelineHook(
 data class PipelineHookAttributes(
     val id: Int,
     val iid: Int? = null,
+    val name: String? = null, // GitLab 16.1+
     val ref: String,
     val tag: Boolean,
     val sha: String,
